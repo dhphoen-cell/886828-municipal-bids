@@ -1,0 +1,11 @@
+# 886828.xyz 定时任务配置
+# 使用方法：crontab /home/w/.openclaw/workspace-taizi/886828-site/crontab.txt
+
+# 每 30 分钟更新一次招标数据
+*/30 * * * * cd /home/w/.openclaw/workspace-taizi/886828-site && source venv/bin/activate && python3 update_data.py >> /tmp/886828_update.log 2>&1
+
+# 每天早上 9 点推送飞书日报
+0 9 * * * cd /home/w/.openclaw/workspace-taizi/886828-site && source venv/bin/activate && python3 feishu_push.py >> /tmp/886828_push.log 2>&1
+
+# 每周一早上 8 点清理旧日志
+0 8 * * 1 find /tmp -name "886828_*.log" -mtime +7 -delete
