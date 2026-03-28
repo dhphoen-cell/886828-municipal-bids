@@ -3,18 +3,18 @@ from datetime import datetime
 import os
 
 # Vercel Python Serverless Function
-# Entry point must be at module level
+# The function name must be 'handler' and receive (request, response) or just request
 
-def main(request):
-    """Vercel Serverless Function - Main Entry Point"""
-    return handle_request(request)
-
-def handle_request(request):
-    """Handle HTTP requests for bids API"""
+def handler(request):
+    """
+    Vercel Serverless Function Handler
+    Exports a handler function at module level
+    """
+    path = request.path if hasattr(request, 'path') else '/'
     
     try:
         # 处理 /api/bids
-        if request.path == '/api/bids':
+        if path == '/api/bids' or path.startswith('/api/bids'):
             bids_path = os.path.join(os.path.dirname(__file__), '..', 'bids.json')
             with open(bids_path, 'r', encoding='utf-8') as f:
                 bids = json.load(f)
@@ -36,7 +36,7 @@ def handle_request(request):
             }
         
         # 处理 /api/stats
-        elif request.path == '/api/stats':
+        elif path == '/api/stats' or path.startswith('/api/stats'):
             stats_path = os.path.join(os.path.dirname(__file__), '..', 'stats.json')
             try:
                 with open(stats_path, 'r', encoding='utf-8') as f:
