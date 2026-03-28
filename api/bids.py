@@ -1,66 +1,76 @@
 import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
+import os
 
-class BidHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/api/bids':
-            try:
-                with open('bids.json', 'r', encoding='utf-8') as f:
-                    bids = json.load(f)
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                response = {
-                    "success": True,
-                    "data": bids[:20],  # 返回最新 20 条
-                    "count": len(bids),
-                    "timestamp": datetime.now().isoformat()
-                }
-                
-                self.wfile.write(json.dumps(response, ensure_ascii=False).encode())
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode())
+def handler(request):
+    """Vercel Serverless Function Handler"""
+    
+    # 获取当前目录（Vercel 部署后文件在 /var/task）
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    
+    try:
+        # 处理 /api/bids
+        if request.path == '/api/bids':
+            bids_path = os.path.join(parent_dir, 'bids.json')
+            with open(bids_path, 'r', encoding='utf-8') as f:
+                bids = json.load(f)
+            
+            response_data = {
+                "success": True,
+                "data": bids[:20],  # 返回最新 20 条
+                "count": len(bids),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": json.dumps(response_data, ensure_ascii=False)
+            }
         
-        elif self.path == '/api/stats':
+        # 处理 /api/stats
+        elif request.path == '/api/stats':
+            stats_path = os.path.join(parent_dir, 'stats.json')
             try:
-                with open('stats.json', 'r', encoding='utf-8') as f:
+                with open(stats_path, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                self.wfile.write(json.dumps(stats, ensure_ascii=False).encode())
             except:
-                # 默认统计
+                # 默认统计数据
                 stats = {
                     "today": 28,
                     "week": 156,
                     "sources": 50,
                     "last_update": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(stats, ensure_ascii=False).encode())
+            
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": json.dumps(stats, ensure_ascii=False)
+            }
         
-        else:
-            self.send_response(404)
-            self.end_headers()
+        # 404
+        return {
+            "statusCode": 404,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({"error": "Not Found"})
+        }
     
-    def log_message(self, format, *args):
-        pass  # 静默日志
-
-if __name__ == '__main__':
-    server = HTTPServer(('0.0.0.0', 8080), BidHandler)
-    print("🚀 API Server running on port 8080")
-    server.serve_forever()
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"success": False, "error": str(e)})
+        }
