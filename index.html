@@ -74,15 +74,15 @@
         <!-- Stats -->
         <div class="stats">
             <div class="stat-card">
-                <div class="number" id="today-count">0</div>
+                <div class="number" id="today-count">-</div>
                 <div class="label">今日招标</div>
             </div>
             <div class="stat-card">
-                <div class="number" id="week-count">0</div>
+                <div class="number" id="week-count">-</div>
                 <div class="label">本周招标</div>
             </div>
             <div class="stat-card">
-                <div class="number" id="source-count">50+</div>
+                <div class="number" id="source-count">-</div>
                 <div class="label">数据源</div>
             </div>
             <div class="stat-card">
@@ -124,10 +124,6 @@
             <ul class="bid-list" id="bid-list">
                 <li class="bid-item">
                     <div class="title">正在加载最新招标信息...</div>
-                    <div class="meta">
-                        <span>📍 数据来源：采集系统中</span>
-                        <span>⏰ 更新时间：即将上线</span>
-                    </div>
                 </li>
             </ul>
         </div>
@@ -151,58 +147,59 @@
     </footer>
 
     <script>
-        // 模拟数据（后续替换为真实 API）
-        const mockBids = [
-            {
-                title: "XX 市道路改造工程招标公告",
-                location: "江苏省南京市",
-                budget: "¥1,200 万",
-                deadline: "2026-04-15",
-                tags: ["道路", "改造"]
-            },
-            {
-                title: "XX 区园林绿化养护项目采购公告",
-                location: "浙江省杭州市",
-                budget: "¥580 万",
-                deadline: "2026-04-20",
-                tags: ["园林", "养护"]
-            },
-            {
-                title: "XX 县排水管网改造工程招标公告",
-                location: "四川省成都市",
-                budget: "¥2,300 万",
-                deadline: "2026-04-18",
-                tags: ["排水", "管网"]
+        // 从 bids.json 加载数据
+        async function loadBids() {
+            try {
+                const response = await fetch('./bids.json');
+                const bids = await response.json();
+                renderBids(bids);
+            } catch (error) {
+                console.error('加载招标数据失败:', error);
+                document.getElementById('bid-list').innerHTML = `
+                    <li class="bid-item">
+                        <div class="title">数据加载中，请稍后刷新页面</div>
+                    </li>
+                `;
             }
-        ];
+        }
+
+        // 从 stats.json 加载统计数据
+        async function loadStats() {
+            try {
+                const response = await fetch('./stats.json');
+                const stats = await response.json();
+                document.getElementById('today-count').textContent = stats.today || '-';
+                document.getElementById('week-count').textContent = stats.week || '-';
+                document.getElementById('source-count').textContent = stats.sources || '-';
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
 
         // 渲染招标列表
-        function renderBids() {
+        function renderBids(bids) {
             const bidList = document.getElementById('bid-list');
-            bidList.innerHTML = mockBids.map(bid => `
+            if (!bids || bids.length === 0) {
+                bidList.innerHTML = '<li class="bid-item"><div class="title">暂无招标数据</div></li>';
+                return;
+            }
+            
+            bidList.innerHTML = bids.slice(0, 20).map(bid => `
                 <li class="bid-item">
-                    <div class="title">${bid.title}</div>
+                    <div class="title">${bid.title || bid.name || '未知项目'}</div>
                     <div class="meta">
-                        <span>📍 ${bid.location}</span>
-                        <span>💰 ${bid.budget}</span>
-                        <span>⏰ 截止：${bid.deadline}</span>
+                        <span>📍 ${bid.location || bid.area || '未知地区'}</span>
+                        <span>💰 ${bid.budget || '面议'}</span>
+                        <span>⏰ 截止：${bid.deadline || bid.date || '未知'}</span>
                     </div>
-                    <div class="tags">
-                        ${bid.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                    </div>
+                    ${bid.tags ? `<div class="tags">${bid.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
                 </li>
             `).join('');
         }
 
-        // 更新统计数据
-        function updateStats() {
-            document.getElementById('today-count').textContent = Math.floor(Math.random() * 50) + 20;
-            document.getElementById('week-count').textContent = Math.floor(Math.random() * 200) + 100;
-        }
-
         // 初始化
-        renderBids();
-        updateStats();
+        loadBids();
+        loadStats();
     </script>
 </body>
 </html>
