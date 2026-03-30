@@ -279,23 +279,29 @@
             <!-- Filter Bar -->
             <div class="mb-8 animate-slide-up" style="animation-delay: 0.1s">
                 <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div class="flex items-center gap-2">
-                        <button class="px-4 py-2 bg-slate-accent/20 text-slate-accent text-sm font-medium rounded-lg border border-slate-accent/30">
+                    <div class="flex items-center gap-2" id="filterButtons">
+                        <button class="px-4 py-2 bg-slate-accent/20 text-slate-accent text-sm font-medium rounded-lg border border-slate-accent/30" data-filter="all">
                             全部
                         </button>
-                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors">
-                            工程建设
+                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors" data-filter="市政">
+                            市政
                         </button>
-                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors">
-                            货物采购
+                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors" data-filter="园林">
+                            园林
                         </button>
-                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors">
-                            服务类
+                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors" data-filter="排水">
+                            排水
+                        </button>
+                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors" data-filter="照明">
+                            照明
+                        </button>
+                        <button class="px-4 py-2 text-ink-400 hover:text-white text-sm font-medium rounded-lg transition-colors" data-filter="环卫">
+                            环卫
                         </button>
                     </div>
                     <div class="flex items-center gap-3">
-                        <input type="text" placeholder="搜索项目名称..." class="px-4 py-2 bg-ink-900 border border-ink-800 rounded-lg text-sm text-white placeholder-ink-500 focus:outline-none focus:border-slate-accent/50 w-64">
-                        <button class="p-2 bg-ink-900 hover:bg-ink-800 border border-ink-800 rounded-lg transition-colors">
+                        <input type="text" id="searchInput" placeholder="搜索项目名称..." class="px-4 py-2 bg-ink-900 border border-ink-800 rounded-lg text-sm text-white placeholder-ink-500 focus:outline-none focus:border-slate-accent/50 w-64">
+                        <button class="p-2 bg-ink-900 hover:bg-ink-800 border border-ink-800 rounded-lg transition-colors" onclick="searchBids()">
                             <svg class="w-5 h-5 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                             </svg>
@@ -306,149 +312,11 @@
 
             <!-- Bid List -->
             <div class="space-y-4" id="bidList">
-                <!-- Bid Item 1 -->
-                <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" style="animation-delay: 0.2s" data-bid='{"id":1,"title":"北京市朝阳区市政道路改造工程招标公告","region":"北京·朝阳","budget":"¥12,500,000","deadline":"2026-04-15","type":"工程建设","source":"全国公共资源交易平台"}'>
-                    <div class="flex items-start justify-between gap-6">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="tag px-2 py-1 bg-slate-accent/20 text-slate-accent rounded border border-slate-accent/30">工程建设</span>
-                                <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">北京·朝阳</span>
-                            </div>
-                            <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
-                                北京市朝阳区市政道路改造工程招标公告
-                            </h3>
-                            <p class="text-ink-500 text-sm line-clamp-2 pl-4">
-                                本项目位于北京市朝阳区，主要包括道路路面修复、排水系统改造、路灯更新等内容，总长度约 3.5 公里...
-                            </p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-2xl font-serif text-crimson mb-1">¥1,250 万</p>
-                            <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
-                                <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs text-ink-400 font-mono">截止：04-15</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Bid Item 2 -->
-                <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" style="animation-delay: 0.3s" data-bid='{"id":2,"title":"上海市浦东新区智慧停车场建设项目","region":"上海·浦东","budget":"¥8,200,000","deadline":"2026-04-20","type":"工程建设","source":"全国公共资源交易平台"}'>
-                    <div class="flex items-start justify-between gap-6">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="tag px-2 py-1 bg-slate-accent/20 text-slate-accent rounded border border-slate-accent/30">工程建设</span>
-                                <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">上海·浦东</span>
-                            </div>
-                            <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
-                                上海市浦东新区智慧停车场建设项目
-                            </h3>
-                            <p class="text-ink-500 text-sm line-clamp-2 pl-4">
-                                建设智慧停车场 3 处，共计车位 800 个，包含智能停车系统、充电桩设施、监控安防系统等...
-                            </p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-2xl font-serif text-crimson mb-1">¥820 万</p>
-                            <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
-                                <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs text-ink-400 font-mono">截止：04-20</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Bid Item 3 -->
-                <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" style="animation-delay: 0.4s" data-bid='{"id":3,"title":"广州市天河区教育系统设备采购项目","region":"广东·广州","budget":"¥5,600,000","deadline":"2026-04-18","type":"货物采购","source":"全国公共资源交易平台"}'>
-                    <div class="flex items-start justify-between gap-6">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="tag px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/30">货物采购</span>
-                                <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">广东·广州</span>
-                            </div>
-                            <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
-                                广州市天河区教育系统设备采购项目
-                            </h3>
-                            <p class="text-ink-500 text-sm line-clamp-2 pl-4">
-                                采购教学设备、实验仪器、多媒体系统等，服务于天河区 15 所中小学校...
-                            </p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-2xl font-serif text-crimson mb-1">¥560 万</p>
-                            <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
-                                <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs text-ink-400 font-mono">截止：04-18</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Bid Item 4 -->
-                <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" style="animation-delay: 0.5s" data-bid='{"id":4,"title":"深圳市南山区城市绿化养护服务项目","region":"广东·深圳","budget":"¥3,800,000","deadline":"2026-04-25","type":"服务类","source":"全国公共资源交易平台"}'>
-                    <div class="flex items-start justify-between gap-6">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="tag px-2 py-1 bg-amber-500/20 text-amber-400 rounded border border-amber-500/30">服务类</span>
-                                <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">广东·深圳</span>
-                            </div>
-                            <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
-                                深圳市南山区城市绿化养护服务项目
-                            </h3>
-                            <p class="text-ink-500 text-sm line-clamp-2 pl-4">
-                                南山区主要道路、公园绿地绿化养护服务，服务期 2 年，包括修剪、施肥、病虫害防治等...
-                            </p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-2xl font-serif text-crimson mb-1">¥380 万</p>
-                            <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
-                                <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs text-ink-400 font-mono">截止：04-25</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Bid Item 5 -->
-                <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" style="animation-delay: 0.6s" data-bid='{"id":5,"title":"杭州市西湖区老旧小区改造工程","region":"浙江·杭州","budget":"¥15,000,000","deadline":"2026-04-30","type":"工程建设","source":"全国公共资源交易平台"}'>
-                    <div class="flex items-start justify-between gap-6">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="tag px-2 py-1 bg-slate-accent/20 text-slate-accent rounded border border-slate-accent/30">工程建设</span>
-                                <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">浙江·杭州</span>
-                            </div>
-                            <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
-                                杭州市西湖区老旧小区改造工程
-                            </h3>
-                            <p class="text-ink-500 text-sm line-clamp-2 pl-4">
-                                涉及 12 个老旧小区，改造内容包括外立面翻新、管网改造、电梯加装、停车位规划等...
-                            </p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-2xl font-serif text-crimson mb-1">¥1,500 万</p>
-                            <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
-                                <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs text-ink-400 font-mono">截止：04-30</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
+                <!-- Cards will be dynamically loaded here -->
             </div>
 
             <!-- Load More -->
-            <div class="mt-12 text-center animate-slide-up" style="animation-delay: 0.7s">
+            <div class="mt-12 text-center animate-slide-up" style="animation-delay: 0.7s" id="loadMoreContainer">
                 <button class="px-8 py-3 bg-ink-900 hover:bg-ink-800 text-white font-medium rounded-xl transition-all border border-ink-800 hover:border-ink-700">
                     加载更多
                 </button>
@@ -479,9 +347,8 @@
             <div class="p-8 overflow-y-auto max-h-[85vh]">
                 <!-- Modal Header -->
                 <div class="flex items-start justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <span id="modalType" class="tag px-2 py-1 bg-slate-accent/20 text-slate-accent rounded border border-slate-accent/30">工程建设</span>
-                        <span id="modalRegion" class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">地区</span>
+                    <div class="flex items-center gap-3" id="modalTags">
+                        <!-- Tags will be inserted here -->
                     </div>
                     <button onclick="closeModal()" class="p-2 hover:bg-ink-800 rounded-lg transition-colors">
                         <svg class="w-5 h-5 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -500,12 +367,23 @@
                         <p id="modalBudget" class="text-xl font-serif text-crimson"></p>
                     </div>
                     <div class="p-4 bg-ink-900/50 rounded-xl border border-ink-800">
-                        <p class="text-xs text-ink-500 font-mono mb-1">截止日期</p>
-                        <p id="modalDeadline" class="text-xl font-serif text-white"></p>
+                        <p class="text-xs text-ink-500 font-mono mb-1">发布日期</p>
+                        <p id="modalDate" class="text-xl font-serif text-white"></p>
                     </div>
                     <div class="p-4 bg-ink-900/50 rounded-xl border border-ink-800">
                         <p class="text-xs text-ink-500 font-mono mb-1">数据来源</p>
                         <p id="modalSource" class="text-sm font-medium text-white mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 text-ink-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span id="modalLocation" class="text-sm"></span>
                     </div>
                 </div>
 
@@ -520,9 +398,9 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-4">
-                    <button class="flex-1 py-3 bg-slate-accent hover:bg-blue-600 text-white font-medium rounded-xl transition-colors">
+                    <a id="modalUrl" href="#" target="_blank" class="flex-1 py-3 bg-slate-accent hover:bg-blue-600 text-white font-medium rounded-xl transition-colors text-center">
                         查看招标公告原文
-                    </button>
+                    </a>
                     <button class="px-6 py-3 bg-ink-800 hover:bg-ink-700 text-white font-medium rounded-xl transition-colors border border-ink-700">
                         收藏
                     </button>
@@ -535,28 +413,186 @@
     </div>
 
     <script>
-        // Modal functionality
-        const modal = document.getElementById('bidModal');
-        const bidCards = document.querySelectorAll('.editorial-card[data-bid]');
+        // Global data store
+        let allBids = [];
+        let filteredBids = [];
+        let currentFilter = 'all';
 
-        bidCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const data = JSON.parse(card.dataset.bid);
-                openModal(data);
-            });
+        // Fetch and render bids on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadBids();
+            setupFilterButtons();
+            setupSearchInput();
         });
 
+        // Fetch bids from JSON file
+        async function loadBids() {
+            try {
+                const response = await fetch('bids.json');
+                if (!response.ok) throw new Error('Failed to load bids.json');
+                allBids = await response.json();
+                filteredBids = [...allBids];
+                renderBids(filteredBids);
+            } catch (error) {
+                console.error('Error loading bids:', error);
+                document.getElementById('bidList').innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-ink-400">数据加载失败，请稍后重试</p>
+                        <p class="text-ink-600 text-sm mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render bid cards
+        function renderBids(bids) {
+            const bidList = document.getElementById('bidList');
+            
+            if (bids.length === 0) {
+                bidList.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-ink-400">暂无符合条件的招标信息</p>
+                    </div>
+                `;
+                return;
+            }
+
+            bidList.innerHTML = bids.map((bid, index) => {
+                const delay = 0.2 + (index * 0.1);
+                const mainTag = bid.tags[0] || '市政';
+                const otherTags = bid.tags.slice(1, 3);
+                
+                return `
+                    <article class="editorial-card rounded-xl p-6 cursor-pointer animate-reveal" 
+                             style="animation-delay: ${delay}s" 
+                             data-bid='${JSON.stringify(bid)}'>
+                        <div class="flex items-start justify-between gap-6">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="tag px-2 py-1 bg-slate-accent/20 text-slate-accent rounded border border-slate-accent/30">${mainTag}</span>
+                                    ${otherTags.map(tag => `
+                                        <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">${tag}</span>
+                                    `).join('')}
+                                    <span class="tag px-2 py-1 bg-ink-800 text-ink-400 rounded border border-ink-700">${bid.location}</span>
+                                </div>
+                                <h3 class="bid-title text-xl font-serif text-white mb-3 pl-4 transition-all">
+                                    ${bid.title}
+                                </h3>
+                                <p class="text-ink-500 text-sm line-clamp-2 pl-4">
+                                    ${bid.source} · 发布日期：${bid.date}
+                                </p>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <p class="text-2xl font-serif text-crimson mb-1">${bid.budget}</p>
+                                <p class="text-xs text-ink-500 font-mono mb-3">预算金额</p>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 rounded-lg border border-ink-800">
+                                    <svg class="w-3.5 h-3.5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                    </svg>
+                                    <span class="text-xs text-ink-400 font-mono">查看原文</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            // Re-attach click listeners
+            document.querySelectorAll('.editorial-card[data-bid]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const data = JSON.parse(card.dataset.bid);
+                    openModal(data);
+                });
+            });
+        }
+
+        // Setup filter buttons
+        function setupFilterButtons() {
+            const buttons = document.querySelectorAll('#filterButtons button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active state
+                    buttons.forEach(btn => {
+                        btn.classList.remove('bg-slate-accent/20', 'text-slate-accent', 'border-slate-accent/30');
+                        btn.classList.add('text-ink-400');
+                    });
+                    button.classList.remove('text-ink-400');
+                    button.classList.add('bg-slate-accent/20', 'text-slate-accent', 'border-slate-accent/30');
+
+                    // Filter bids
+                    currentFilter = button.dataset.filter;
+                    if (currentFilter === 'all') {
+                        filteredBids = [...allBids];
+                    } else {
+                        filteredBids = allBids.filter(bid => 
+                            bid.tags.some(tag => tag.includes(currentFilter))
+                        );
+                    }
+                    renderBids(filteredBids);
+                });
+            });
+        }
+
+        // Setup search input
+        function setupSearchInput() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (query === '') {
+                    filteredBids = currentFilter === 'all' ? [...allBids] : allBids.filter(bid => 
+                        bid.tags.some(tag => tag.includes(currentFilter))
+                    );
+                } else {
+                    filteredBids = allBids.filter(bid => 
+                        bid.title.toLowerCase().includes(query) ||
+                        bid.location.toLowerCase().includes(query) ||
+                        bid.tags.some(tag => tag.toLowerCase().includes(query))
+                    );
+                }
+                renderBids(filteredBids);
+            });
+        }
+
+        // Search function
+        function searchBids() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.toLowerCase().trim();
+            if (query === '') {
+                filteredBids = [...allBids];
+            } else {
+                filteredBids = allBids.filter(bid => 
+                    bid.title.toLowerCase().includes(query) ||
+                    bid.location.toLowerCase().includes(query) ||
+                    bid.tags.some(tag => tag.toLowerCase().includes(query))
+                );
+            }
+            renderBids(filteredBids);
+        }
+
+        // Modal functionality
+        const modal = document.getElementById('bidModal');
+
         function openModal(data) {
-            document.getElementById('modalType').textContent = data.type;
-            document.getElementById('modalRegion').textContent = data.region;
+            // Set tags
+            const tagsContainer = document.getElementById('modalTags');
+            tagsContainer.innerHTML = data.tags.map((tag, index) => {
+                const bgColor = index === 0 ? 'bg-slate-accent/20 text-slate-accent border-slate-accent/30' : 'bg-ink-800 text-ink-400 border-ink-700';
+                return `<span class="tag px-2 py-1 rounded border ${bgColor}">${tag}</span>`;
+            }).join('');
+
             document.getElementById('modalTitle').textContent = data.title;
             document.getElementById('modalBudget').textContent = data.budget;
-            document.getElementById('modalDeadline').textContent = data.deadline;
+            document.getElementById('modalDate').textContent = data.date;
             document.getElementById('modalSource').textContent = data.source;
+            document.getElementById('modalLocation').textContent = data.location;
+            document.getElementById('modalUrl').href = data.url;
+            
             document.getElementById('modalDescription').textContent = `
-                ${data.title}。本项目${data.region}，预算${data.budget}，投标截止时间为${data.deadline}。
-                详情请查看招标公告原文。投标人需具备相应资质，并按要求提交投标文件。
+                ${data.title}。本项目位于${data.location}，预算${data.budget}，发布日期为${data.date}。
+                数据来源：${data.source}。投标人需具备相应资质，并按要求提交投标文件。
+                详情请查看招标公告原文。
             `;
+            
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
@@ -575,12 +611,14 @@
         });
 
         // Hover effect enhancement
-        bidCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-4px)';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0)';
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.editorial-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-4px)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
             });
         });
     </script>
