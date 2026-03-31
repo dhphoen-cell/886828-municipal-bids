@@ -1,6 +1,8 @@
 {
-  "today": 5,
-  "week": 5,
-  "sources": 50,
-  "last_update": "2026-03-28 12:51:43"
+  "total": 3,
+  "updated_at": "2026-03-31T11:20:24.660493",
+  "today": 3,
+  "sources": [
+    "中国政府采购网"
+  ]
 }

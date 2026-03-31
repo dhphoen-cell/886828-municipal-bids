@@ -3,6 +3,13 @@
 """
 886828.xyz - 市政招标数据采集脚本
 数据源：全国各级政府采购网、公共资源交易中心
+
+功能：
+- 多数据源采集
+- 数据质量验证
+- 自动去重
+- 兜底模拟数据
+- 详细日志记录
 """
 
 import requests
@@ -11,6 +18,19 @@ import json
 import time
 from datetime import datetime, timedelta
 import re
+import logging
+import sys
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('/home/w/.openclaw/workspace-taizi/886828-site/crawler.log', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # 数据源配置
 SOURCES = [
@@ -150,33 +170,90 @@ def generate_mock_data():
     ]
     return mock_bids
 
-def save_to_json(data, filename='bids.json'):
-    """保存到 JSON 文件"""
+def validate_bid(bid):
+    """验证单条数据质量"""
+    required_fields = ['title', 'source', 'url', 'date']
+    for field in required_fields:
+        if field not in bid or not bid[field]:
+            return False, f"缺少必填字段：{field}"
+    
+    # 验证 URL 格式
+    if not bid['url'].startswith(('http://', 'https://')):
+        return False, "URL 格式错误"
+    
+    # 验证日期格式
+    try:
+        datetime.strptime(bid['date'], '%Y-%m-%d')
+    except ValueError:
+        return False, "日期格式错误"
+    
+    return True, "验证通过"
+
+def save_to_json(data, filename='/home/w/.openclaw/workspace-taizi/886828-site/bids.json'):
+    """保存到 JSON 文件并生成统计"""
+    # 验证数据质量
+    valid_data = []
+    invalid_count = 0
+    
+    for bid in data:
+        is_valid, msg = validate_bid(bid)
+        if is_valid:
+            valid_data.append(bid)
+        else:
+            invalid_count += 1
+            logger.warning(f"无效数据：{bid.get('title', 'N/A')} - {msg}")
+    
+    if invalid_count > 0:
+        logger.warning(f"共 {invalid_count} 条数据未通过验证，已过滤")
+    
+    # 保存有效数据
     with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"✅ 已保存 {len(data)} 条数据到 {filename}")
+        json.dump(valid_data, f, ensure_ascii=False, indent=2)
+    
+    logger.info(f"✅ 已保存 {len(valid_data)} 条有效数据到 {filename}")
+    
+    # 生成统计
+    stats = {
+        "total": len(valid_data),
+        "updated_at": datetime.now().isoformat(),
+        "today": len([b for b in valid_data if b.get('date') == datetime.now().strftime('%Y-%m-%d')]),
+        "sources": list(set(b['source'] for b in valid_data))
+    }
+    
+    stats_file = filename.replace('bids.json', 'stats.json')
+    with open(stats_file, 'w', encoding='utf-8') as f:
+        json.dump(stats, f, ensure_ascii=False, indent=2)
+    
+    logger.info(f"📊 统计已保存到 {stats_file}")
+    
+    return len(valid_data)
 
 def main():
     """主函数"""
-    print("🚀 886828.xyz 市政招标数据采集开始")
-    print(f"⏰ 时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("-" * 50)
+    logger.info("🚀 886828.xyz 市政招标数据采集开始")
+    logger.info(f"⏰ 时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info("-" * 50)
     
     all_bids = []
+    failed_sources = []
     
     # 采集各数据源
     for source in SOURCES:
-        print(f"📡 采集：{source['name']}")
+        logger.info(f"📡 采集：{source['name']}")
         html = fetch_page(source['url'])
         if html:
             bids = parse_ccgp(html)
             all_bids.extend(bids)
-            print(f"   ✅ 获取 {len(bids)} 条市政招标")
+            logger.info(f"   ✅ 获取 {len(bids)} 条市政招标")
+        else:
+            failed_sources.append(source['name'])
+            logger.warning(f"   ❌ 采集失败：{source['name']}")
         time.sleep(1)  # 礼貌爬取
     
     # 如果采集失败或数据太少，使用模拟数据
     if len(all_bids) < 3:
-        print("⚠️  采集数据不足，使用模拟数据")
+        logger.warning("⚠️  采集数据不足，使用模拟数据")
+        logger.warning(f"   失败数据源：{', '.join(failed_sources) if failed_sources else '无'}")
         all_bids = generate_mock_data()
     
     # 去重
@@ -188,11 +265,11 @@ def main():
             seen.add(key)
             unique_bids.append(bid)
     
-    print("-" * 50)
-    print(f"📊 合计：{len(unique_bids)} 条市政招标信息")
+    logger.info("-" * 50)
+    logger.info(f"📊 合计：{len(unique_bids)} 条市政招标信息")
     
-    # 保存
-    save_to_json(unique_bids, '/home/w/.openclaw/workspace-taizi/886828-site/bids.json')
+    # 保存并验证
+    saved_count = save_to_json(unique_bids)
     
     # 输出统计
     today = datetime.now().strftime('%Y-%m-%d')
@@ -200,8 +277,16 @@ def main():
     week_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
     week_count = len([b for b in unique_bids if b.get('date', '') >= week_ago])
     
-    print(f"📈 今日：{today_count} 条 | 本周：{week_count} 条")
-    print("✅ 采集完成")
+    logger.info(f"📈 今日：{today_count} 条 | 本周：{week_count} 条")
+    logger.info("✅ 采集完成")
+    
+    return {
+        "success": True,
+        "count": saved_count,
+        "today": today_count,
+        "week": week_count,
+        "failed_sources": failed_sources
+    }
 
 if __name__ == '__main__':
     main()
