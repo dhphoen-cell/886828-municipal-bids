@@ -1,6 +1,9 @@
 {
   "version": 2,
   "output": "static",
+  "git": {
+    "deploymentEnabled": true
+  },
   "routes": [
     {
       "src": "/bids\\.json",
