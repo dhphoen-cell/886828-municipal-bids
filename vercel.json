@@ -1,24 +1,22 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.json",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.css",
-      "use": "@vercel/static"
-    }
-  ],
+  "output": "static",
   "routes": [
+    {
+      "src": "/bids\\.json",
+      "dest": "/bids.json",
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "public, max-age=60, must-revalidate"
+      }
+    },
+    {
+      "src": "/stats\\.json",
+      "dest": "/stats.json",
+      "headers": {
+        "content-type": "application/json"
+      }
+    },
     {
       "src": "/(.*)",
       "dest": "/$1"
