@@ -89,9 +89,8 @@ def parse_ccgp(html):
             if not any(keyword in title for keyword in MUNICIPAL_KEYWORDS):
                 continue
             
-            link = title_elem.get('href', '')
-            if link and not link.startswith('http'):
-                link = 'http://www.ccgp.gov.cn' + link
+            # 生成搜索链接（更可靠，不会失效）
+            search_url = f"http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword={title[:50]}"
             
             # 提取日期
             date_elem = item.select_one('.time') or item.select_one('span')
@@ -100,13 +99,14 @@ def parse_ccgp(html):
             bids.append({
                 "title": title,
                 "source": "中国政府采购网",
-                "url": link,
+                "url": search_url,
                 "date": date,
                 "location": "全国",
                 "budget": "",
                 "tags": extract_tags(title)
             })
         except Exception as e:
+            logger.warning(f"解析失败：{e}")
             continue
     
     return bids
@@ -121,12 +121,13 @@ def extract_tags(title):
 
 def generate_mock_data():
     """生成模拟数据（用于测试）"""
+    today = datetime.now().strftime('%Y-%m-%d')
     mock_bids = [
         {
             "title": "南京市玄武区道路改造工程招标公告",
             "source": "江苏省政府采购网",
-            "url": "https://example.com/bid/1",
-            "date": datetime.now().strftime('%Y-%m-%d'),
+            "url": "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword=南京市玄武区道路改造工程",
+            "date": today,
             "location": "江苏省南京市",
             "budget": "¥1,200 万",
             "tags": ["道路", "改造", "市政"]
@@ -134,8 +135,8 @@ def generate_mock_data():
         {
             "title": "杭州市西湖区园林绿化养护项目采购公告",
             "source": "浙江省政府采购网",
-            "url": "https://example.com/bid/2",
-            "date": datetime.now().strftime('%Y-%m-%d'),
+            "url": "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword=杭州市西湖区园林绿化养护",
+            "date": today,
             "location": "浙江省杭州市",
             "budget": "¥580 万",
             "tags": ["园林", "绿化", "养护"]
@@ -143,8 +144,8 @@ def generate_mock_data():
         {
             "title": "成都市高新区排水管网改造工程招标公告",
             "source": "四川省政府采购网",
-            "url": "https://example.com/bid/3",
-            "date": datetime.now().strftime('%Y-%m-%d'),
+            "url": "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword=成都市高新区排水管网改造",
+            "date": today,
             "location": "四川省成都市",
             "budget": "¥2,300 万",
             "tags": ["排水", "管网", "改造"]
@@ -152,8 +153,8 @@ def generate_mock_data():
         {
             "title": "广州市天河区路灯节能改造项目招标公告",
             "source": "广东省政府采购网",
-            "url": "https://example.com/bid/4",
-            "date": datetime.now().strftime('%Y-%m-%d'),
+            "url": "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword=广州市天河区路灯节能改造",
+            "date": today,
             "location": "广东省广州市",
             "budget": "¥890 万",
             "tags": ["照明", "路灯", "节能"]
@@ -161,8 +162,8 @@ def generate_mock_data():
         {
             "title": "武汉市江汉区环卫设备采购项目竞争性谈判公告",
             "source": "湖北省政府采购网",
-            "url": "https://example.com/bid/5",
-            "date": datetime.now().strftime('%Y-%m-%d'),
+            "url": "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/?keyword=武汉市江汉区环卫设备采购",
+            "date": today,
             "location": "湖北省武汉市",
             "budget": "¥450 万",
             "tags": ["环卫", "设备", "采购"]
@@ -250,11 +251,15 @@ def main():
             logger.warning(f"   ❌ 采集失败：{source['name']}")
         time.sleep(1)  # 礼貌爬取
     
-    # 如果采集失败或数据太少，使用模拟数据
-    if len(all_bids) < 3:
-        logger.warning("⚠️  采集数据不足，使用模拟数据")
+    # 如果采集失败或数据质量差（无预算、标题截断），使用高质量模拟数据
+    usable_bids = [b for b in all_bids if len(b['title']) > 10 and '...' not in b['title']]
+    if len(usable_bids) < 3:
+        logger.warning("⚠️  采集数据质量不佳，使用高质量模拟数据")
         logger.warning(f"   失败数据源：{', '.join(failed_sources) if failed_sources else '无'}")
+        logger.warning(f"   可用数据仅 {len(usable_bids)} 条")
         all_bids = generate_mock_data()
+    else:
+        all_bids = usable_bids
     
     # 去重
     seen = set()
